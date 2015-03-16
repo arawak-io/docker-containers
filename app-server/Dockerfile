@@ -35,13 +35,15 @@ RUN mkdir /opt/arawak
 
 WORKDIR /opt/arawak
 
+RUN npm install -g bower gulp mean-cli
+
 RUN git config --global http.sslVerify false \
   && git clone -q https://github.com/arawak-io/webapp.git .
 
 VOLUME ["/opt/arawak"]
 
-RUN npm install -g bower gulp mean-cli
-RUN useradd arawak && su arawak
 RUN npm install 
+
+RUN bower --allow-root
 
 CMD ["gulp"]
