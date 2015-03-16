@@ -1,4 +1,4 @@
-FROM debian:wheezy
+FROM debian:jessie
 
 MAINTAINER Lovell Felix <lovellfelix@gmail.com>
 
@@ -19,7 +19,7 @@ ENV APP_LOG_DIR /tmp
 
 RUN buildDeps='curl' \
 	&& set -x \
-	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends openssh-server git-core bzip2 \
+	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends openssh-server git-core bzip2 vim \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
 	&& curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
@@ -29,21 +29,19 @@ RUN buildDeps='curl' \
 	&& rm "node-v$NODE_VERSION-linux-x64.tar.gz" SHASUMS256.txt.asc \
 	&& apt-get purge -y --auto-remove $buildDeps \
 	&& npm install -g npm@"$NPM_VERSION" \
-	&& npm install -g bower grunt-cli mean-cli gulp \
 	&& npm cache clear
 
-RUN mkdir /opt/cashew
+RUN mkdir /opt/arawak
 
-WORKDIR /opt/cashew
+WORKDIR /opt/arawak
 
 RUN git config --global http.sslVerify false \
   && git clone -q https://github.com/arawak-io/webapp.git .
 
-VOLUME ["/opt/app"]
+VOLUME ["/opt/arawak"]
 
-RUN npm install
-
+RUN npm install -g bower gulp mean-cli
+RUN useradd arawak && su arawak
+RUN npm install 
 
 CMD ["gulp"]
-
-EXPOSE 3000:3000
